@@ -1,25 +1,128 @@
-const express = require('express')
+const express = require("express");
+const {
+  listContacts,
+  getContactById,
+  addContact,
+  removeContact,
+  updateContact,
+} = require("../../models/contacts.js");
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+const STATUS_CODES = {
+  success: 200,
+  created: 201,
+  deleted: 204,
+  notFound: 404,
+  badRequest: 400,
+  error: 500,
+};
 
-router.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+// TODO Functia Respod With Error:
+const respondWithError = (res, error) => {
+  console.error(error);
+  res.status(STATUS_CODES.error).json({ message: `${error}` });
+};
 
-router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+// TODO GET (LIST):
+router.get("/", async (req, res, next) => {
+  try {
+    const contacts = await listContacts();
+    res
+      .status(STATUS_CODES.success)
+      .json({ message: "The list was successfully returned", data: contacts });
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
 
-router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+// TODO GET id (GET Contact By Id):
+router.get("/:contactId", async (req, res, next) => {
+  try {
+    const contact = await getContactById(req.params.contactId);
+    console.log(req.params.contactId);
 
-router.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+    if (!contact) {
+      throw new Error("The contact was not found");
+    }
 
-module.exports = router
+    res.status(STATUS_CODES.success).json({
+      message: "The contact has been returned successfully",
+      data: contact,
+    });
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
+
+// TODO POST (add /create):
+router.post("/", async (req, res, next) => {
+  const { name, email, phone } = req.body;
+
+  if (!name || !email || !phone) {
+    res
+      .status(STATUS_CODES.badRequest)
+      .json({ message: "missing required name, email, or phone field" });
+    return;
+  }
+
+  try {
+    const newContact = await addContact({ name, email, phone });
+    res.status(STATUS_CODES.created).json(newContact);
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
+
+// TODO DELETE:
+router.delete("/:contactId", async (req, res, next) => {
+  try {
+    const contactId = req.params.contactId;
+    const removedContact = await removeContact(contactId);
+
+    if (!removedContact) {
+      res
+        .status(STATUS_CODES.notFound)
+        .json({ message: "The contact was not found" });
+      return;
+    }
+
+    res
+      .status(STATUS_CODES.deleted)
+      .json({ message: "Contact deleted successfully" });
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
+
+// TODO PUT (Update By Id):
+router.put("/:contactId", async (req, res, next) => {
+  const { name, email, phone } = req.body;
+  const contactId = req.params.contactId;
+
+  if (!name || !email || !phone) {
+    res
+      .status(STATUS_CODES.badRequest)
+      .json({ message: "missing required name, email, or phone field" });
+    return;
+  }
+
+  try {
+    const updatedContact = await updateContact(contactId, {
+      name,
+      email,
+      phone,
+    });
+    if (!updatedContact) {
+      res
+        .status(STATUS_CODES.notFound)
+        .json({ message: "The contact was not found" });
+      return;
+    }
+    res.status(STATUS_CODES.success).json(updatedContact);
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
+
+module.exports = router;
