@@ -1,6 +1,19 @@
 // TODO aici gestionam operațiile CRUD (create, read, update, delete):
 
 const express = require("express");
+const Joi = require("joi");
+
+const nameExistence = Joi.object({
+  name: Joi.string().required(),
+});
+
+const formatSchema = Joi.object({
+  name: Joi.string().pattern(/^[a-zA-Z\s-]+$/),
+  email: Joi.string().email({
+    minDomainSegments: 2,
+  }),
+  phone: Joi.string().pattern(/^[0-9\s\-()+]+$/),
+});
 
 // TODO importam funcțiile de manipulare a datelor:
 const {
@@ -63,10 +76,21 @@ router.get("/:contactId", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   const { name, email, phone } = req.body;
 
-  if (!name || !email || !phone) {
+  const { error: existenceError } = nameExistence.validate({ name });
+
+  if (existenceError) {
     res
       .status(STATUS_CODES.badRequest)
-      .json({ message: "missing required name, email, or phone field" });
+      .json({ message: "Name field is required" });
+    return;
+  }
+
+  const { error: formatError } = formatSchema.validate({ name, email, phone });
+
+  if (formatError) {
+    res
+      .status(STATUS_CODES.badRequest)
+      .json({ message: formatError.details[0].message });
     return;
   }
 
@@ -104,11 +128,12 @@ router.put("/:contactId", async (req, res, next) => {
   const { name, email, phone } = req.body;
   const contactId = req.params.contactId;
 
-  if (!name && !email && !phone) {
-    res.status(STATUS_CODES.badRequest).json({
-      message:
-        "At least one field (name, email, phone) must be provided for update",
-    });
+  const { error: formatError } = formatSchema.validate({ name, email, phone });
+
+  if (formatError) {
+    res
+      .status(STATUS_CODES.badRequest)
+      .json({ message: formatError.details[0].message });
     return;
   }
 
