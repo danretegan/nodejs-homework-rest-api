@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const CONTACTS_FILE_PATH = "./models/contacts.json";
 
+// TODO Functia save Contacts To File:
 const saveContactsToFile = async (contactsData) => {
   try {
     await fs.writeFile(
@@ -16,6 +17,7 @@ const saveContactsToFile = async (contactsData) => {
   }
 };
 
+// TODO Functia read Contacts From File:
 const readContactsFromFile = async () => {
   try {
     const contactsJSON = await fs.readFile(CONTACTS_FILE_PATH);
@@ -26,15 +28,18 @@ const readContactsFromFile = async () => {
   }
 };
 
+// TODO list Contacts:
 const listContacts = async () => {
   return await readContactsFromFile();
 };
 
+// TODO get Contact by id:
 const getContactById = async (contactId) => {
   const contacts = await readContactsFromFile();
   return contacts.find((element) => element.id === contactId);
 };
 
+// TODO delete Contact:
 const removeContact = async (contactId) => {
   const contacts = await readContactsFromFile();
   const updatedContacts = contacts.filter(
@@ -45,28 +50,37 @@ const removeContact = async (contactId) => {
   return updatedContacts;
 };
 
+// TODO create Contact:
 const addContact = async (body) => {
-  const contacts = await readContactsFromFile();
-  const preparedContact = {
-    id: uuidv4(),
-    ...body,
-  };
-  contacts.push(preparedContact);
-  await saveContactsToFile(contacts);
-  console.log("Contact added successfully!");
+  try {
+    const contacts = await readContactsFromFile();
+    const preparedContact = {
+      id: uuidv4(),
+      ...body,
+    };
+    contacts.push(preparedContact);
+    await saveContactsToFile(contacts);
+    console.log("Contact added successfully!");
+  } catch (error) {
+    throw new Error(`Error adding contact: ${error.message}`);
+  }
 };
 
-const updateContact = async (contactId, body) => {
-  const contacts = await readContactsFromFile();
-  const contactIndex = contacts.findIndex((c) => c.id === contactId);
-  if (contactIndex === -1) {
-    throw new Error("Contact not found");
+// TODO update Contact:
+const updateContact = async (updatedContact, contactId) => {
+  try {
+    const contacts = await readContactsFromFile();
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+    if (index === -1) {
+      throw new Error("The contact was not found.");
+    }
+    const updatedFields = { ...contacts[index], ...updatedContact };
+    contacts[index] = { ...updatedFields, id: contactId };
+    await saveContactsToFile(contacts);
+    return contacts[index];
+  } catch (error) {
+    throw new Error(`Error updating contact: ${error.message}`);
   }
-  const updatedContact = { ...contacts[contactIndex], ...body };
-  contacts[contactIndex] = updatedContact;
-  await saveContactsToFile(contacts);
-  console.log("Contact updated successfully!");
-  return updatedContact;
 };
 
 module.exports = {

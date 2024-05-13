@@ -1,4 +1,8 @@
+// TODO aici gestionam operațiile CRUD (create, read, update, delete):
+
 const express = require("express");
+
+// TODO importam funcțiile de manipulare a datelor:
 const {
   listContacts,
   getContactById,
@@ -100,25 +104,24 @@ router.put("/:contactId", async (req, res, next) => {
   const { name, email, phone } = req.body;
   const contactId = req.params.contactId;
 
-  if (!name || !email || !phone) {
-    res
-      .status(STATUS_CODES.badRequest)
-      .json({ message: "missing required name, email, or phone field" });
+  if (!name && !email && !phone) {
+    res.status(STATUS_CODES.badRequest).json({
+      message:
+        "At least one field (name, email, phone) must be provided for update",
+    });
     return;
   }
 
   try {
-    const updatedContact = await updateContact(contactId, {
-      name,
-      email,
-      phone,
-    });
+    const updatedContact = await updateContact(req.body, contactId);
+
     if (!updatedContact) {
       res
         .status(STATUS_CODES.notFound)
         .json({ message: "The contact was not found" });
       return;
     }
+
     res.status(STATUS_CODES.success).json(updatedContact);
   } catch (error) {
     respondWithError(res, error);
