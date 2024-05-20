@@ -1,19 +1,6 @@
 // TODO aici gestionam operațiile CRUD (create, read, update, delete):
 
 const express = require("express");
-const Joi = require("joi");
-
-const nameExistence = Joi.object({
-  name: Joi.string().required(),
-});
-
-const formatSchema = Joi.object({
-  name: Joi.string().pattern(/^[a-zA-Z\s-]+$/),
-  email: Joi.string().email({
-    minDomainSegments: 2,
-  }),
-  phone: Joi.string().pattern(/^[0-9\s\-()+]+$/),
-});
 
 // TODO importam funcțiile de manipulare a datelor:
 const {
@@ -22,7 +9,7 @@ const {
   addContact,
   removeContact,
   updateContact,
-} = require("../../models/contacts.js");
+} = require("../../controller/contactsController.js");
 
 const router = express.Router();
 
@@ -42,6 +29,7 @@ const respondWithError = (res, error) => {
 };
 
 // TODO GET (LIST):
+/* GET localhost:3000/api/products */
 router.get("/", async (req, res, next) => {
   try {
     const contacts = await listContacts();
@@ -54,6 +42,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // TODO GET id (GET Contact By Id):
+/* GET localhost:3000/api/products/:id */
 router.get("/:contactId", async (req, res, next) => {
   try {
     const contact = await getContactById(req.params.contactId);
@@ -73,26 +62,9 @@ router.get("/:contactId", async (req, res, next) => {
 });
 
 // TODO POST (add /create):
+/* POST localhost:3000/api/products/ */
 router.post("/", async (req, res, next) => {
   const { name, email, phone } = req.body;
-
-  const { error: existenceError } = nameExistence.validate({ name });
-
-  if (existenceError) {
-    res
-      .status(STATUS_CODES.badRequest)
-      .json({ message: "Name field is required" });
-    return;
-  }
-
-  const { error: formatError } = formatSchema.validate({ name, email, phone });
-
-  if (formatError) {
-    res
-      .status(STATUS_CODES.badRequest)
-      .json({ message: formatError.details[0].message });
-    return;
-  }
 
   try {
     const newContact = await addContact({ name, email, phone });
@@ -103,6 +75,7 @@ router.post("/", async (req, res, next) => {
 });
 
 // TODO DELETE:
+/* DELETE localhost:3000/api/products/:id */
 router.delete("/:contactId", async (req, res, next) => {
   try {
     const contactId = req.params.contactId;
@@ -124,18 +97,9 @@ router.delete("/:contactId", async (req, res, next) => {
 });
 
 // TODO PUT (Update By Id):
+/* PUT localhost:3000/api/products/:id */
 router.put("/:contactId", async (req, res, next) => {
-  const { name, email, phone } = req.body;
   const contactId = req.params.contactId;
-
-  const { error: formatError } = formatSchema.validate({ name, email, phone });
-
-  if (formatError) {
-    res
-      .status(STATUS_CODES.badRequest)
-      .json({ message: formatError.details[0].message });
-    return;
-  }
 
   try {
     const updatedContact = await updateContact(req.body, contactId);
