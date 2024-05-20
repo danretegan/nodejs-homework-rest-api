@@ -1,7 +1,7 @@
 {
-  "name": "template",
-  "version": "0.0.0",
-  "private": true,
+  "name": "nodejs-hw-rest-api",
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./server.js",
     "start:dev": "cross-env NODE_ENV=development nodemon ./server.js",
@@ -9,10 +9,12 @@
     "lint:fix": "eslint --fix **/*.js"
   },
   "dependencies": {
+    "colors": "^1.4.0",
     "cors": "2.8.5",
     "cross-env": "7.0.3",
     "express": "^4.19.2",
     "joi": "^17.13.1",
+    "mongoose": "^8.4.0",
     "morgan": "1.10.0",
     "uuid": "^9.0.1"
   },
