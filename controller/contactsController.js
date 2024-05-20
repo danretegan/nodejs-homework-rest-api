@@ -4,7 +4,7 @@ const colors = require("colors");
 // TODO LIST Contacts:
 const listContacts = async () => {
   try {
-    console.log("--- List Contacts: --- ".bgYellow.italic.bold);
+    console.log(colors.bgYellow.italic.bold("--- List Contacts: ---"));
     return await Contact.find();
   } catch (error) {
     console.error(error);
@@ -16,7 +16,7 @@ const listContacts = async () => {
 const getContactById = async (contactId) => {
   try {
     console.log(
-      `--- List Contact with id ${contactId}: --- `.bgYellow.italic.bold
+      colors.bgYellow.italic.bold(`--- List Contact with id ${contactId}: ---`)
     );
     return await Contact.findById(contactId);
   } catch (error) {
@@ -29,7 +29,9 @@ const getContactById = async (contactId) => {
 const removeContact = async (contactId) => {
   try {
     console.log(
-      `--- Delete Contact with id ${contactId}: --- `.bgYellow.italic.bold
+      colors.bgYellow.italic.bold(
+        `--- Delete Contact with id ${contactId}: ---`
+      )
     );
     return await Contact.findByIdAndDelete(contactId);
   } catch (error) {
@@ -40,7 +42,7 @@ const removeContact = async (contactId) => {
 
 // TODO CREATE Contact:
 const addContact = async (contact) => {
-  console.log(`---  New Contact Created: --- `.bgYellow.italic.bold);
+  console.log(colors.bgYellow.italic.bold(`---  New Contact Created: ---`));
   try {
     return await Contact.create(contact);
   } catch (error) {
@@ -52,7 +54,7 @@ const addContact = async (contact) => {
 // TODO UPDATE Contact By Id:
 const updateContact = async (updatedContact, contactId) => {
   console.log(
-    `--- Update Contact with id ${contactId}: --- `.bgYellow.italic.bold
+    colors.bgYellow.italic.bold(`--- Update Contact with id ${contactId}: ---`)
   );
   try {
     const updatedDoc = await Contact.findByIdAndUpdate(
