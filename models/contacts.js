@@ -21,7 +21,7 @@ const schema = new Schema({
     type: String,
     minLength: 3,
     maxLength: 30,
-    required: true,
+    required: [true, "Set name for contact"],
   },
   email: {
     type: String,

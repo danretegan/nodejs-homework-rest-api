@@ -72,10 +72,33 @@ const updateContact = async (updatedContact, contactId) => {
   }
 };
 
+const updateStatusContact = async (contactId, updatedStatus) => {
+  console.log(
+    colors.bgYellow.italic.bold(
+      `--- Change Status for Contact with id ${contactId}: --- `
+    )
+  );
+  try {
+    const updatedDoc = await Contact.findByIdAndUpdate(
+      contactId,
+      updatedStatus,
+      { new: true }
+    );
+    if (!updatedDoc) {
+      throw new Error("The contact was not found.");
+    }
+    return updatedDoc;
+  } catch (error) {
+    console.error(colors.red(error));
+    throw new Error(`Error updating contact status: ${error.message}`);
+  }
+};
+
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };

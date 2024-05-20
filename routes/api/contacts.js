@@ -10,6 +10,7 @@ const {
   addContact,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../../controller/contactsController.js");
 
 const router = express.Router();
@@ -112,6 +113,28 @@ router.put("/:contactId", async (req, res, next) => {
       return;
     }
 
+    res.status(STATUS_CODES.success).json(updatedContact);
+  } catch (error) {
+    respondWithError(res, error);
+  }
+});
+
+// TODO @ PATCH /api/contacts/:contactId/favorite
+router.patch("/:contactId/favorite", async (req, res) => {
+  const contactId = req.params.contactId;
+  const { favorite } = req.body;
+
+  if (favorite === undefined) {
+    return res
+      .status(STATUS_CODES.badRequest)
+      .json({ message: "missing field favorite" });
+  }
+
+  try {
+    const updatedContact = await updateStatusContact(contactId, { favorite });
+    if (!updatedContact) {
+      return res.status(STATUS_CODES.notFound).json({ message: "Not found" });
+    }
     res.status(STATUS_CODES.success).json(updatedContact);
   } catch (error) {
     respondWithError(res, error);
