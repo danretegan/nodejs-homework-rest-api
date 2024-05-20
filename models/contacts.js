@@ -1,92 +1,50 @@
-const fs = require("fs/promises");
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
 
-const CONTACTS_FILE_PATH = "./models/contacts.json";
+/**
+{
+  "_id": {
+    "$oid": "664ac4ce83b712a0156cf3c8"
+  },
+  "name": "Allen Raymond",
+  "email": "nulla.ante@vestibul.co.uk",
+  "phone": "(992) 914-3792",
+  "favorite": false
+}
+ */
 
-// TODO Functia save Contacts To File:
-const saveContactsToFile = async (contactsData) => {
-  try {
-    await fs.writeFile(
-      CONTACTS_FILE_PATH,
-      JSON.stringify(contactsData, null, 2)
-    );
-    console.log("Contacts saved successfully!");
-  } catch (error) {
-    console.error("Error saving contacts:", error);
-    throw new Error("Failed to save contacts");
-  }
-};
+const phoneRegex =
+  /^(\+?\d{1,3})?[-.\s]?(\(?\d{2,4}\)?[-.\s]?)?(\d{2,4}[-.\s]?\d{2,4}[-.\s]?\d{2,4})$/;
 
-// TODO Functia read Contacts From File:
-const readContactsFromFile = async () => {
-  try {
-    const contactsJSON = await fs.readFile(CONTACTS_FILE_PATH);
-    return JSON.parse(contactsJSON);
-  } catch (error) {
-    console.error("Error reading contacts:", error);
-    throw new Error("Failed to read contacts");
-  }
-};
+const schema = new Schema({
+  name: {
+    type: String,
+    minLength: 3,
+    maxLength: 30,
+    required: [true, "Set name for contact"],
+  },
+  email: {
+    type: String,
+    trim: true,
+    unique: true,
+    required: true,
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex pentru validarea email-ului.Pentru validarea riguroasă a email-urilor, se poate utiliza o bibliotecă specializată.
+  },
+  phone: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return phoneRegex.test(v); // Validare număr de telefon flexibilă
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-// TODO list Contacts:
-const listContacts = async () => {
-  return await readContactsFromFile();
-};
+const Contact = model("Contact", schema);
 
-// TODO get Contact by id:
-const getContactById = async (contactId) => {
-  const contacts = await readContactsFromFile();
-  return contacts.find((element) => element.id === contactId);
-};
-
-// TODO delete Contact:
-const removeContact = async (contactId) => {
-  const contacts = await readContactsFromFile();
-  const updatedContacts = contacts.filter(
-    (element) => element.id !== contactId
-  );
-  await saveContactsToFile(updatedContacts);
-  console.log(`Contact with id: ${contactId} removed successfully!`);
-  return updatedContacts;
-};
-
-// TODO create Contact:
-const addContact = async (body) => {
-  try {
-    const contacts = await readContactsFromFile();
-    const preparedContact = {
-      id: uuidv4(),
-      ...body,
-    };
-    contacts.push(preparedContact);
-    await saveContactsToFile(contacts);
-    console.log("Contact added successfully!");
-  } catch (error) {
-    throw new Error(`Error adding contact: ${error.message}`);
-  }
-};
-
-// TODO update Contact:
-const updateContact = async (updatedContact, contactId) => {
-  try {
-    const contacts = await readContactsFromFile();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) {
-      throw new Error("The contact was not found.");
-    }
-    const updatedFields = { ...contacts[index], ...updatedContact };
-    contacts[index] = { ...updatedFields, id: contactId };
-    await saveContactsToFile(contacts);
-    return contacts[index];
-  } catch (error) {
-    throw new Error(`Error updating contact: ${error.message}`);
-  }
-};
-
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-};
+module.exports = Contact;
