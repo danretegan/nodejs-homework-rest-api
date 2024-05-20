@@ -1,6 +1,7 @@
 // TODO aici gestionam operațiile CRUD (create, read, update, delete):
 
 const express = require("express");
+const colors = require("colors");
 
 // TODO importam funcțiile de manipulare a datelor:
 const {
@@ -24,7 +25,7 @@ const STATUS_CODES = {
 
 // TODO Functia Respod With Error:
 const respondWithError = (res, error) => {
-  console.error(error);
+  console.error(colors.bgRed.italic.bold(error));
   res.status(STATUS_CODES.error).json({ message: `${error}` });
 };
 

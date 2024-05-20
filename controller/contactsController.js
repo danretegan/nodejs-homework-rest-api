@@ -7,7 +7,7 @@ const listContacts = async () => {
     console.log(colors.bgYellow.italic.bold("--- List Contacts: ---"));
     return await Contact.find();
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error listing contacts: ${error.message}`);
   }
 };
@@ -20,7 +20,7 @@ const getContactById = async (contactId) => {
     );
     return await Contact.findById(contactId);
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error getting contact by id: ${error.message}`);
   }
 };
@@ -35,7 +35,7 @@ const removeContact = async (contactId) => {
     );
     return await Contact.findByIdAndDelete(contactId);
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error removing contact: ${error.message}`);
   }
 };
@@ -46,7 +46,7 @@ const addContact = async (contact) => {
   try {
     return await Contact.create(contact);
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error adding contact: ${error.message}`);
   }
 };
@@ -67,7 +67,7 @@ const updateContact = async (updatedContact, contactId) => {
     }
     return updatedDoc;
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error updating contact: ${error.message}`);
   }
 };

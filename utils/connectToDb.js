@@ -8,7 +8,7 @@ async function connectToDb() {
     );
     console.log(colors.bgGreen.italic.bold("Database connection successful!"));
   } catch (error) {
-    console.error(error);
+    console.error(colors.bgRed.italic.bold(error));
     process.exit(1);
   }
 }
