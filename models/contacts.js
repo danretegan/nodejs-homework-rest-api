@@ -28,7 +28,7 @@ const schema = new Schema({
     trim: true,
     unique: true,
     required: true,
-    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex pentru validarea email-ului.Pentru validarea riguroasă a email-urilor, se poate utiliza o bibliotecă specializată.
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex pentru validarea email-ului. Pentru validarea riguroasă a email-urilor, se poate utiliza o bibliotecă specializată.
   },
   phone: {
     type: String,

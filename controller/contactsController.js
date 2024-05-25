@@ -1,3 +1,5 @@
+// TODO Aici interacționăm cu baza de date:
+
 const Contact = require("../models/contacts.js");
 const colors = require("colors");
 

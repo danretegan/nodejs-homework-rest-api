@@ -1,4 +1,4 @@
-// TODO aici gestionam operațiile CRUD (create, read, update, delete):
+// TODO aici gestionăm operațiile CRUD (create, read, update, delete) și returnam un răspuns către client. Aici gestionăm interacțiunea cu utilizatorul final:
 
 const express = require("express");
 const colors = require("colors");
@@ -31,7 +31,7 @@ const respondWithError = (res, error) => {
 };
 
 // TODO GET (LIST):
-/* GET localhost:3000/api/products */
+/* GET localhost:3000/api/contacts */
 router.get("/", async (req, res, next) => {
   try {
     const contacts = await listContacts();
@@ -44,7 +44,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // TODO GET id (GET Contact By Id):
-/* GET localhost:3000/api/products/:id */
+/* GET localhost:3000/api/contacts/:id */
 router.get("/:contactId", async (req, res, next) => {
   try {
     const contact = await getContactById(req.params.contactId);
@@ -64,7 +64,7 @@ router.get("/:contactId", async (req, res, next) => {
 });
 
 // TODO POST (add /create):
-/* POST localhost:3000/api/products/ */
+/* POST localhost:3000/api/contacts/ */
 router.post("/", async (req, res, next) => {
   const { name, email, phone } = req.body;
 
@@ -77,7 +77,7 @@ router.post("/", async (req, res, next) => {
 });
 
 // TODO DELETE:
-/* DELETE localhost:3000/api/products/:id */
+/* DELETE localhost:3000/api/contacts/:id */
 router.delete("/:contactId", async (req, res, next) => {
   try {
     const contactId = req.params.contactId;
@@ -99,7 +99,7 @@ router.delete("/:contactId", async (req, res, next) => {
 });
 
 // TODO PUT (Update By Id):
-/* PUT localhost:3000/api/products/:id */
+/* PUT localhost:3000/api/contacts/:id */
 router.put("/:contactId", async (req, res, next) => {
   const contactId = req.params.contactId;
 
