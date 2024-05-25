@@ -43,6 +43,10 @@ const schema = new Schema({
     type: Boolean,
     default: false,
   },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "user", // Referință la modelul 'User'
+  },
 });
 
 const Contact = model("Contact", schema);
