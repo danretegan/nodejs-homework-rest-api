@@ -1,5 +1,7 @@
 const express = require("express");
 const AuthController = require("../../controllers/authController.js");
+const User = require("../../models/user.js");
+const colors = require("colors");
 const router = express.Router();
 
 // TODO Validare payload pentru signup:
@@ -79,6 +81,43 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     res.status(401).json({ message: error.message });
+  }
+});
+
+// TODO GET /users/logout
+router.get("/logout", AuthController.validateAuth, async (req, res, next) => {
+  try {
+    const header = req.get("authorization");
+    if (!header) {
+      return res
+        .status(401)
+        .json({ message: "E nevoie de autentificare pentru aceasta ruta." });
+    }
+
+    console.log(colors.bgYellow.italic.bold("--- Logout! ---"));
+    const token = header.split(" ")[1];
+    const payload = AuthController.getPayloadFromJWT(token);
+
+    if (!payload) {
+      console.log("Invalid token payload");
+      return res.status(401).json({ message: "Invalid token." });
+    }
+
+    const filter = { _id: payload.userId };
+    const user = await User.findOne(filter);
+
+    if (!user) {
+      console.log("User not found:", filter);
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    user.token = null;
+    await user.save();
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
