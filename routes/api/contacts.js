@@ -13,7 +13,7 @@ const {
   removeContact,
   updateContact,
   updateStatusContact,
-} = require("../../controller/contactsController.js");
+} = require("../../controllers/contactsController.js");
 
 const router = express.Router();
 

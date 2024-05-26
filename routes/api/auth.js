@@ -1,9 +1,8 @@
 const express = require("express");
-const User = require("../../models/user.js");
-
+const AuthController = require("../../controllers/authController.js");
 const router = express.Router();
 
-// TODO Validation function:
+// TODO Validare payload pentru signup:
 function validateSignupPayload(data) {
   const { email, password } = data;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,36 +22,31 @@ function validateSignupPayload(data) {
   return null;
 }
 
-// TODO POST /users/signup:
+// TODO Validare payload pentru LOGIN:
+function validateLoginPayload(data) {
+  const { email, password } = data;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email || !password) {
+    return "Email and password are required";
+  }
+
+  if (!emailRegex.test(email)) {
+    return "Invalid email format";
+  }
+
+  return null;
+}
+
+// TODO POST /users/signup
 router.post("/signup", async (req, res) => {
   try {
-    //! Validate the request payload:
     const validationError = validateSignupPayload(req.body);
-
     if (validationError) {
-      return res.status(400).json({
-        message: validationError,
-      });
+      return res.status(400).json({ message: validationError });
     }
 
-    const { email, password } = req.body;
-
-    // TODO Check if the user already exists:
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: "Email in use",
-      });
-    }
-
-    //! Create a new user:
-    const newUser = new User({ email });
-    newUser.setPassword(password);
-
-    await newUser.save();
-
-    //! Return success response:
+    const newUser = await AuthController.signup(req.body);
     res.status(201).json({
       user: {
         email: newUser.email,
@@ -60,10 +54,31 @@ router.post("/signup", async (req, res) => {
       },
     });
   } catch (error) {
-    //! Handle server errors:
-    res.status(500).json({
-      message: error.message,
+    if (error.message === "Email in use") {
+      return res.status(409).json({ message: error.message });
+    }
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// TODO POST /users/login
+router.post("/login", async (req, res) => {
+  try {
+    const validationError = validateLoginPayload(req.body);
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
+    }
+
+    const { token, user } = await AuthController.login(req.body);
+    res.status(200).json({
+      token,
+      user: {
+        email: user.email,
+        subscription: user.subscription,
+      },
     });
+  } catch (error) {
+    res.status(401).json({ message: error.message });
   }
 });
 
