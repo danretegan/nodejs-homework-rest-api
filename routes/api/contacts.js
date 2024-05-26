@@ -1,9 +1,13 @@
 // TODO aici gestionăm operațiile CRUD (create, read, update, delete) și returnam un răspuns către client. Aici gestionăm interacțiunea cu utilizatorul final:
 
+require("../../passport.js");
+
 const express = require("express");
 const colors = require("colors");
 
 const { STATUS_CODES } = require("../../utils/constants.js");
+
+const AuthController = require("../../controllers/authController.js");
 
 // TODO importam funcțiile de manipulare a datelor:
 const {
@@ -25,9 +29,10 @@ const respondWithError = (res, error) => {
 
 // TODO GET (LIST):
 /* GET localhost:3000/api/contacts */
-router.get("/", async (req, res, next) => {
+router.get("/", AuthController.validateAuth, async (req, res, next) => {
   try {
     const contacts = await listContacts();
+
     res
       .status(STATUS_CODES.success)
       .json({ message: "The list was successfully returned", data: contacts });

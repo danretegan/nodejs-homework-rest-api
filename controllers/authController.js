@@ -1,3 +1,4 @@
+const passport = require("passport");
 const colors = require("colors");
 const User = require("../models/user.js");
 const bcrypt = require("bcryptjs");
@@ -7,7 +8,11 @@ require("dotenv").config();
 const AuthController = {
   signup,
   login,
+  validateAuth,
+  getPayloadFromJWT,
 };
+
+const secretForToken = process.env.TOKEN_SECRET;
 
 // TODO SIGNUP:
 async function signup(data) {
@@ -73,7 +78,7 @@ async function login(data) {
     {
       userId: user._id,
     },
-    process.env.TOKEN_SECRET,
+    secretForToken,
     {
       expiresIn: "1h",
     }
@@ -83,6 +88,31 @@ async function login(data) {
   await user.save();
 
   return { token, user };
+}
+
+function getPayloadFromJWT(token) {
+  try {
+    const payload = jwt.verify(token, secretForToken);
+
+    return payload;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function validateAuth(req, res, next) {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    if (!user || err) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized",
+        data: "Unauthorized",
+      });
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
 }
 
 module.exports = AuthController;
