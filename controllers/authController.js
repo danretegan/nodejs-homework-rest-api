@@ -1,5 +1,4 @@
 const passport = require("passport");
-const colors = require("colors");
 const User = require("../models/user.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
