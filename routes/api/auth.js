@@ -50,7 +50,7 @@ router.post("/signup", async (req, res) => {
 
     const newUser = await AuthController.signup(req.body);
 
-    console.log(colors.bgYellow.italic.bold(`--- Signup! ---`));
+    console.log(colors.bgYellow.italic.bold("--- Signup! ---"));
 
     res.status(201).json({
       user: {
