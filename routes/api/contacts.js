@@ -3,6 +3,8 @@
 const express = require("express");
 const colors = require("colors");
 
+const { STATUS_CODES } = require("../../utils/constants.js");
+
 // TODO importam funcțiile de manipulare a datelor:
 const {
   listContacts,
@@ -14,15 +16,6 @@ const {
 } = require("../../controller/contactsController.js");
 
 const router = express.Router();
-
-const STATUS_CODES = {
-  success: 200,
-  created: 201,
-  deleted: 204,
-  notFound: 404,
-  badRequest: 400,
-  error: 500,
-};
 
 // TODO Functia Respod With Error:
 const respondWithError = (res, error) => {

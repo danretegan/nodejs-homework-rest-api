@@ -16,7 +16,7 @@ const { Schema, model } = mongoose;
 const phoneRegex =
   /^(\+?\d{1,3})?[-.\s]?(\(?\d{2,4}\)?[-.\s]?)?(\d{2,4}[-.\s]?\d{2,4}[-.\s]?\d{2,4})$/;
 
-const schema = new Schema({
+const contactSchema = new Schema({
   name: {
     type: String,
     minLength: 3,
@@ -49,6 +49,6 @@ const schema = new Schema({
   },
 });
 
-const Contact = model("Contact", schema);
+const Contact = model("Contact", contactSchema);
 
 module.exports = Contact;
