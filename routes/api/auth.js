@@ -49,6 +49,9 @@ router.post("/signup", async (req, res) => {
     }
 
     const newUser = await AuthController.signup(req.body);
+
+    console.log(colors.bgYellow.italic.bold(`--- Signup! ---`));
+
     res.status(201).json({
       user: {
         email: newUser.email,
@@ -72,6 +75,11 @@ router.post("/login", async (req, res) => {
     }
 
     const { token, user } = await AuthController.login(req.body);
+
+    console.log(
+      colors.bgYellow.italic.bold(`--- user ${user.email} Login! ---`)
+    );
+
     res.status(200).json({
       token,
       user: {
@@ -94,7 +102,6 @@ router.get("/logout", AuthController.validateAuth, async (req, res, next) => {
         .json({ message: "E nevoie de autentificare pentru aceasta ruta." });
     }
 
-    console.log(colors.bgYellow.italic.bold("--- Logout! ---"));
     const token = header.split(" ")[1];
     const payload = AuthController.getPayloadFromJWT(token);
 
@@ -110,6 +117,10 @@ router.get("/logout", AuthController.validateAuth, async (req, res, next) => {
       console.log("User not found:", filter);
       return res.status(401).json({ message: "Not authorized" });
     }
+
+    console.log(
+      colors.bgYellow.italic.bold(`--- user ${user.email} Logout! ---`)
+    );
 
     user.token = null;
     await user.save();
@@ -130,7 +141,9 @@ router.get("/current", AuthController.validateAuth, async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Not authorized" });
     }
-
+    console.log(colors.bgYellow.italic.bold("--- Current user data: ---"));
+    console.log("email:", user.email);
+    console.log("subscription:", user.subscription);
     res.status(200).json({
       email: user.email,
       subscription: user.subscription,

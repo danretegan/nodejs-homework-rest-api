@@ -16,8 +16,6 @@ const secretForToken = process.env.TOKEN_SECRET;
 
 // TODO SIGNUP:
 async function signup(data) {
-  console.log(colors.bgYellow.italic.bold("--- Signup: ---"));
-
   //! Validare pentru email și password:
   const { email, password } = data;
   if (!email || !password) {
@@ -55,8 +53,6 @@ async function signup(data) {
 
 // TODO LOGIN:
 async function login(data) {
-  console.log(colors.bgYellow.italic.bold("--- Login: ---"));
-
   const { email, password } = data;
 
   //! Validare pentru email și password:
