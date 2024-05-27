@@ -2,6 +2,7 @@ const express = require("express");
 const AuthController = require("../../controllers/authController.js");
 const User = require("../../models/user.js");
 const colors = require("colors");
+const UserController = require("../../controllers/userController.js");
 const router = express.Router();
 
 // TODO Validare payload pentru signup:
@@ -148,6 +149,45 @@ router.get("/current", AuthController.validateAuth, async (req, res, next) => {
       email: user.email,
       subscription: user.subscription,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// TODO PATCH /users/:userId
+router.patch("/:userId", AuthController.validateAuth, async (req, res) => {
+  try {
+    //! Convertim ID-ul utilizatorului din token în șir de caractere:
+    const userIdFromToken = req.user._id.toString();
+    //! ID-ul utilizatorului specificat în ruta endpoint-ului:
+    const userIdFromRequest = req.params.userId;
+
+    if (userIdFromToken !== userIdFromRequest) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    //! Actualizam abonamentul utilizatorului:
+    const { subscription } = req.body;
+    const validSubscriptions = ["starter", "pro", "business"];
+    if (!validSubscriptions.includes(subscription)) {
+      return res.status(400).json({ message: "Invalid subscription" });
+    }
+
+    const updatedUser = await UserController.updateSubscription(
+      userIdFromRequest,
+      subscription
+    );
+
+    res.status(200).json({
+      message: "Subscription updated successfully!",
+      user: updatedUser,
+    });
+    console.log(
+      colors.bgYellow.italic.bold(
+        `--- Subscription ${subscription} updated successfully! ---`
+      )
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
