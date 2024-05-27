@@ -3,11 +3,22 @@
 const Contact = require("../models/contact.js");
 const colors = require("colors");
 
-// TODO LIST Contacts:
-const listContacts = async () => {
+// TODO LIST Contacts with Pagination:
+const listContacts = async (page = 1, limit = 5) => {
   try {
     console.log(colors.bgYellow.italic.bold("--- List Contacts: ---"));
-    return await Contact.find();
+
+    const skip = (page - 1) * limit;
+
+    const contacts = await Contact.find().skip(skip).limit(limit);
+    const totalContacts = await Contact.countDocuments();
+
+    return {
+      contacts,
+      totalContacts,
+      totalPages: Math.ceil(totalContacts / limit),
+      currentPage: page,
+    };
   } catch (error) {
     console.error(colors.bgRed.italic.bold(error));
     throw new Error(`Error listing contacts: ${error.message}`);

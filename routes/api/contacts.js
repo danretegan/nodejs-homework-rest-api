@@ -24,11 +24,16 @@ const respondWithError = (res, error) => {
 // TODO GET (LIST):
 /* GET localhost:3000/api/contacts */
 router.get("/", AuthController.validateAuth, async (req, res, next) => {
+  const { page = 1, limit = 5 } = req.query; // Extragem parametrii page și limit din query string
   try {
-    const contacts = await listContacts();
-    res
-      .status(STATUS_CODES.success)
-      .json({ message: "The list was successfully returned", data: contacts });
+    const contactsData = await listContacts(Number(page), Number(limit));
+    res.status(STATUS_CODES.success).json({
+      message: "The list was successfully returned",
+      data: contactsData.contacts,
+      totalContacts: contactsData.totalContacts,
+      totalPages: contactsData.totalPages,
+      currentPage: contactsData.currentPage,
+    });
   } catch (error) {
     respondWithError(res, error);
   }
