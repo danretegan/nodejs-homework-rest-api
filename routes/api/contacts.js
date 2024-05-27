@@ -24,9 +24,18 @@ const respondWithError = (res, error) => {
 // TODO GET (LIST):
 /* GET localhost:3000/api/contacts */
 router.get("/", AuthController.validateAuth, async (req, res, next) => {
-  const { page = 1, limit = 5 } = req.query; // Extragem parametrii page și limit din query string
+  const { page = 1, limit = 5, favorite } = req.query;
+
   try {
-    const contactsData = await listContacts(Number(page), Number(limit));
+    // Convert favorite to boolean if it's defined
+    const favoriteFilter =
+      favorite !== undefined ? favorite === "true" : undefined;
+
+    const contactsData = await listContacts(
+      Number(page),
+      Number(limit),
+      favoriteFilter
+    );
     res.status(STATUS_CODES.success).json({
       message: "The list was successfully returned",
       data: contactsData.contacts,
