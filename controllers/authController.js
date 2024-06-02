@@ -104,8 +104,10 @@ function getPayloadFromJWT(token) {
 
 //! Funcția pentru validarea autentificării:
 function validateAuth(req, res, next) {
+  console.log("validateAuth middleware called");
   passport.authenticate("jwt", { session: false }, (err, user) => {
     if (!user || err) {
+      console.log("Unauthorized request"); // Log pentru debugging
       return res.status(401).json({
         status: "error",
         code: 401,
@@ -113,6 +115,7 @@ function validateAuth(req, res, next) {
         data: "Unauthorized",
       });
     }
+    console.log("User authenticated:", user); // Log utilizator autentificat
     req.user = user;
     next();
   })(req, res, next);
