@@ -6,7 +6,6 @@ const connectToDb = require("./utils/connectToDb");
 
 const contactsRouter = require("./routes/api/contacts");
 
-// TODO Ne cream o ruta auth, folosim un router nou pentru autentificare:
 const authRouter = require("./routes/api/auth");
 
 const app = express();
@@ -15,13 +14,15 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 connectToDb();
 
+// TODO Configurăm framework-ul Express pentru a distribui fișierele statice din folderul public:
+app.use(express.static("public"));
+
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
 
-// TODO Ne cream o ruta auth, folosim un router nou pentru autentificare:
 app.use("/api/auth", authRouter);
 
 app.use((req, res) => {

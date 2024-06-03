@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const bcrypt = require("bcryptjs");
 
+//! Definirea modelului User:
 const userSchema = new Schema({
   email: {
     type: String,
@@ -21,8 +22,15 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+
+  //! În modelul de utilizator, adaug o nouă proprietate, avatarURL, pentru a stoca imaginea. (avatarURL: String,):
+  avatarURL: {
+    type: String,
+    default: null,
+  },
 });
 
+//! Metode pentru setarea și validarea parolei:
 userSchema.methods.setPassword = function (password) {
   this.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 };

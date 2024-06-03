@@ -1,8 +1,8 @@
 const passport = require("passport");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.js");
 require("dotenv").config();
+const gravatar = require("gravatar");
 
 const AuthController = {
   signup,
@@ -15,8 +15,9 @@ const secretForToken = process.env.TOKEN_SECRET;
 
 // TODO SIGNUP:
 async function signup(data) {
-  //! Validare pentru email și password:
   const { email, password } = data;
+
+  //! Validare pentru email și password:
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
@@ -36,14 +37,19 @@ async function signup(data) {
     throw new Error("Email in use");
   }
 
+  //! gravatar
+  const userAvatar = gravatar.url(email);
+
   //! Crearea unui nou utilizator:
   const newUser = new User({
-    email: data.email,
+    email: email,
     subscription: "starter",
+    token: null,
+    avatarURL: userAvatar,
   });
 
   //! Setarea parolei:
-  newUser.setPassword(data.password);
+  newUser.setPassword(password);
 
   await newUser.save();
 
@@ -64,7 +70,7 @@ async function login(data) {
     throw new Error("Email or password is wrong");
   }
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
+  const passwordMatch = user.validPassword(password);
   if (!passwordMatch) {
     throw new Error("Email or password is wrong");
   }
@@ -85,6 +91,7 @@ async function login(data) {
   return { token, user };
 }
 
+//! Funcția pentru obținerea payload-ului din JWT:
 function getPayloadFromJWT(token) {
   try {
     const payload = jwt.verify(token, secretForToken);
@@ -95,9 +102,12 @@ function getPayloadFromJWT(token) {
   }
 }
 
+//! Funcția pentru validarea autentificării:
 function validateAuth(req, res, next) {
+  console.log("validateAuth middleware called");
   passport.authenticate("jwt", { session: false }, (err, user) => {
     if (!user || err) {
+      console.log("Unauthorized request"); // Log pentru debugging
       return res.status(401).json({
         status: "error",
         code: 401,
@@ -105,6 +115,7 @@ function validateAuth(req, res, next) {
         data: "Unauthorized",
       });
     }
+    console.log("User authenticated:", user); // Log utilizator autentificat
     req.user = user;
     next();
   })(req, res, next);
