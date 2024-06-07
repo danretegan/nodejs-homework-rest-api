@@ -22,11 +22,18 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
-
-  //! În modelul de utilizator, adaug o nouă proprietate, avatarURL, pentru a stoca imaginea. (avatarURL: String,):
   avatarURL: {
     type: String,
     default: null,
+  },
+  //! false în câmpul verify va însemna că e-mailul utilizatorului nu a fost încă verificat:
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [true, "Verify token is required"],
   },
 });
 
