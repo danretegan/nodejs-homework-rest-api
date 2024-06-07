@@ -9,6 +9,7 @@ const AuthController = {
   login,
   validateAuth,
   getPayloadFromJWT,
+  getUserByValidationToken,
 };
 
 const secretForToken = process.env.TOKEN_SECRET;
@@ -119,6 +120,20 @@ function validateAuth(req, res, next) {
     req.user = user;
     next();
   })(req, res, next);
+}
+
+//! Funcția pentru găsirea unui user în baza de date folosind un token de validare, user cu emailul încă nevalidat:
+async function getUserByValidationToken(token) {
+  const user = await User.findOne({
+    verificationToken: token,
+    verify: false,
+  });
+
+  if (user) {
+    return true;
+  }
+
+  return false;
 }
 
 module.exports = AuthController;

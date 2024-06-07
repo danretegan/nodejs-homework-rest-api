@@ -4,6 +4,8 @@ const AuthController = require("../../controllers/authController.js");
 const UserController = require("../../controllers/userController.js");
 const FileController = require("../../controllers/fileController.js");
 const User = require("../../models/user.js");
+const { STATUS_CODES } = require("../../utils/constants.js");
+const { respondWithError } = require("../../utils/respondWithError.js");
 
 const router = express.Router();
 
@@ -217,6 +219,34 @@ router.patch(
 );
 
 // TODO GET endpoint /users/verify/:verificationToken
-router.get("/verify/:verificationToken");
+router.get("/verify/:verificationToken", async (req, res) => {
+  //* 'req.params.verificationToken' extrage partea ':verificationToken' din URL și o stochează în variabila 'token':
+  const token = req.params.verificationToken;
+
+  //* se apelează funcția getUserByValidationToken din AuthController cu token-ul extras. Aceasta returnează true dacă utilizatorul este găsit și false dacă nu:
+  const hasUser = await AuthController.getUserByValidationToken(token);
+
+  if (hasUser) {
+    try {
+      await User.findOneAndUpdate(
+        //* caută un utilizator în baza de date care are verificationToken egal cu token. Dacă găsește un astfel de utilizator, actualizează câmpul verify la true:
+        { verificationToken: token },
+        { verify: true }
+      );
+    } catch (error) {
+      throw new Error(
+        "The username could not be found or it was already validated."
+      );
+    }
+
+    //* Dacă actualizarea este reușită, serverul trimite un răspuns cu statusul 200 și urmatorul mesaj:
+    res.status(200).send({
+      message: "Verification succsessful",
+    });
+  } else {
+    //* Dacă hasUser este false (adică utilizatorul nu a fost găsit), se apelează funcția respondWithError pentru a trimite un răspuns de eroare. Mesajul de eroare este "User not found":
+    respondWithError(res, new Error("User not found"), STATUS_CODES.error);
+  }
+});
 
 module.exports = router;
