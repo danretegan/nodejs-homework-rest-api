@@ -196,7 +196,7 @@ router.patch("/:userId", AuthController.validateAuth, async (req, res) => {
   }
 });
 
-// TODO PATCH /avatars
+// TODO PATCH /users/avatars:
 router.patch(
   "/avatars",
   AuthController.validateAuth,
@@ -217,6 +217,6 @@ router.patch(
 );
 
 // TODO GET endpoint /users/verify/:verificationToken
-router.get("/users/verify/:verificationToken");
+router.get("/verify/:verificationToken");
 
 module.exports = router;
