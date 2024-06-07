@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.js");
 require("dotenv").config();
 const gravatar = require("gravatar");
+const { v4: uuidv4 } = require("uuid");
 
 const AuthController = {
   signup,
@@ -38,8 +39,10 @@ async function signup(data) {
     throw new Error("Email in use");
   }
 
-  //! gravatar
   const userAvatar = gravatar.url(email);
+
+  //! implementez o functie care sa genereze un token:
+  const token = uuidv4();
 
   //! Crearea unui nou utilizator:
   const newUser = new User({
@@ -47,6 +50,9 @@ async function signup(data) {
     subscription: "starter",
     token: null,
     avatarURL: userAvatar,
+    //! Adaugam la noul user:
+    verificationToken: token,
+    verify: false,
   });
 
   //! Setarea parolei:
@@ -66,7 +72,9 @@ async function login(data) {
     throw new Error("Email and password are required");
   }
 
-  const user = await User.findOne({ email });
+  //* Trebuie să se țină cont de faptul că utilizatorul nu va putea să se autentifice până când adresa lui de e-mail nu a fost verificată. Deci adaugam si 'verify: true':
+  const user = await User.findOne({ email: email, verify: true });
+
   if (!user) {
     throw new Error("Email or password is wrong");
   }
