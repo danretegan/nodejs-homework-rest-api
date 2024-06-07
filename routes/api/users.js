@@ -216,4 +216,7 @@ router.patch(
   }
 );
 
+// TODO GET endpoint /users/verify/:verificationToken
+router.get("/users/verify/:verificationToken");
+
 module.exports = router;
