@@ -4,6 +4,7 @@ const User = require("../models/user.js");
 require("dotenv").config();
 const gravatar = require("gravatar");
 const { v4: uuidv4 } = require("uuid");
+const sendWithSendGrid = require("../utils/sendEmail.js");
 
 const AuthController = {
   signup,
@@ -54,6 +55,9 @@ async function signup(data) {
     verificationToken: token,
     verify: false,
   });
+
+  //! Apelez functia sendWithSendGrid():
+  sendWithSendGrid(email, token);
 
   //! Setarea parolei:
   newUser.setPassword(password);
