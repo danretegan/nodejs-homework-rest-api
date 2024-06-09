@@ -1,21 +1,22 @@
-# Folosim imaginea de bază Alpine Linux cu NodeJS preinstalat:
-FROM node:18-alpine
+# Obtinem imaginea de Alpine Linux cu NodeJS pre-instalat
+FROM node:slim
 
-# Setăm directorul de lucru în care vor fi copiate fișierele aplicației:
-WORKDIR /app
+# Setam directorul in care o sa fie copiate fisierele aplicatiei noastre
+WORKDIR /nodejs-homework-rest-api
 
-# Copiem fișierul package.json și package-lock.json pentru a instala pachetele npm:
-COPY package*.json ./
-
-# Instalăm pachetele npm:
-RUN npm install
-
-# Copiem restul fișierelor aplicației în container:
+# Copiem din folderul nostru, in folderul din container
 COPY . .
 
-# Expunem portul pe care rulează aplicația (în acest caz 3000):
-EXPOSE 3000
+# Instalam pachetele npm
+RUN npm install
 
-# Pornim aplicația:
-CMD ["npm", "run", "start"]
- 
+# Pornim aplicatia
+ENTRYPOINT npm run start
+
+# COMENZI DE RULAT IN TERMINAL:
+
+# Build the image, run in terminal:
+# docker build -t contacts-app .
+
+# Run the image
+# docker run -dp 127.0.0.1:3000:3000 contacts-app
