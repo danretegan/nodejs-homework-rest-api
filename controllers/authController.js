@@ -12,6 +12,7 @@ const AuthController = {
   validateAuth,
   getPayloadFromJWT,
   getUserByValidationToken,
+  updateToken,
 };
 
 const secretForToken = process.env.TOKEN_SECRET;
@@ -146,6 +147,14 @@ async function getUserByValidationToken(token) {
   }
 
   return false;
+}
+
+async function updateToken(email, token) {
+  token = token || uuidv4();
+
+  await User.findOneAndUpdate({ email: email }, { verificationToken: token });
+
+  sendWithSendGrid(email, token);
 }
 
 module.exports = AuthController;
