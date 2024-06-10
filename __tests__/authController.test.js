@@ -21,7 +21,7 @@ describe("AuthController - login", () => {
   });
 
   //! Testăm dacă funcția returnează un token și un user pentru credențiale valide:
-  it("should return status code 200 and a token for valid credentials", async () => {
+  it("should return a token and user for valid credentials", async () => {
     const email = "test@example.com";
     const password = "validPassword";
     const userId = "userId123";
@@ -53,7 +53,7 @@ describe("AuthController - login", () => {
     expect(result.user.subscription).toBe("starter");
 
     //! Verificăm dacă funcțiile mock au fost apelate cu parametrii corecți:
-    expect(User.findOne).toHaveBeenCalledWith({ email });
+    expect(User.findOne).toHaveBeenCalledWith({ email: email, verify: true });
     expect(userMock.validPassword).toHaveBeenCalledWith(password);
     expect(jwt.sign).toHaveBeenCalledWith({ userId: userId }, secretForToken, {
       expiresIn: "1h",
@@ -91,7 +91,7 @@ describe("AuthController - login", () => {
 
     await expect(login(data)).rejects.toThrow("Email or password is wrong");
 
-    expect(User.findOne).toHaveBeenCalledWith({ email });
+    expect(User.findOne).toHaveBeenCalledWith({ email: email, verify: true });
   });
 
   //! Testăm dacă funcția aruncă o eroare atunci când parola este incorectă:
@@ -111,7 +111,7 @@ describe("AuthController - login", () => {
 
     await expect(login(data)).rejects.toThrow("Email or password is wrong");
 
-    expect(User.findOne).toHaveBeenCalledWith({ email });
+    expect(User.findOne).toHaveBeenCalledWith({ email: email, verify: true });
     expect(userMock.validPassword).toHaveBeenCalledWith(password);
   });
 });

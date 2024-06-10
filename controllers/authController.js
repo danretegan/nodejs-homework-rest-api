@@ -4,6 +4,7 @@ const User = require("../models/user.js");
 require("dotenv").config();
 const gravatar = require("gravatar");
 const { v4: uuidv4 } = require("uuid");
+const sendWithSendGrid = require("../utils/sendEmail.js");
 
 const AuthController = {
   signup,
@@ -11,6 +12,7 @@ const AuthController = {
   validateAuth,
   getPayloadFromJWT,
   getUserByValidationToken,
+  updateToken,
 };
 
 const secretForToken = process.env.TOKEN_SECRET;
@@ -54,6 +56,9 @@ async function signup(data) {
     verificationToken: token,
     verify: false,
   });
+
+  //! Apelez functia sendWithSendGrid():
+  sendWithSendGrid(email, token);
 
   //! Setarea parolei:
   newUser.setPassword(password);
@@ -142,6 +147,14 @@ async function getUserByValidationToken(token) {
   }
 
   return false;
+}
+
+async function updateToken(email, token) {
+  token = token || uuidv4();
+
+  await User.findOneAndUpdate({ email: email }, { verificationToken: token });
+
+  sendWithSendGrid(email, token);
 }
 
 module.exports = AuthController;
